@@ -1,0 +1,40 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+.venv/
+venv/
+env/
+.env
+.env.local
+
+# Data / models
+data/chroma/
+data/faiss.index
+data/google_tokens/
+data/sample_docs/*.cached
+*.pkl
+*.bin
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Local Claude Code settings
+.claude/

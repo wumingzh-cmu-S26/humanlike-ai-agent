@@ -1,0 +1,62 @@
+{
+  "family": "humanlike-ai-agent",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "4096",
+  "executionRoleArn": "arn:aws:iam::000000000000:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::000000000000:role/humanlike-ai-agent-task-role",
+  "containerDefinitions": [
+    {
+      "name": "api",
+      "image": "<ECR_URI>/humanlike-ai-agent:latest",
+      "essential": true,
+      "portMappings": [{ "containerPort": 8000, "protocol": "tcp" }],
+      "environment": [
+        { "name": "APP_ENV", "value": "production" },
+        { "name": "OTEL_EXPORTER_OTLP_ENDPOINT", "value": "http://localhost:4317" },
+        { "name": "OTEL_SERVICE_NAME", "value": "humanlike-ai-agent" }
+      ],
+      "secrets": [
+        { "name": "OPENAI_API_KEY", "valueFrom": "arn:aws:secretsmanager:us-east-1:000000000000:secret:openai-api-key" },
+        { "name": "JWT_SECRET_KEY", "valueFrom": "arn:aws:secretsmanager:us-east-1:000000000000:secret:jwt-secret-key" },
+        { "name": "TELEGRAM_BOT_TOKEN", "valueFrom": "arn:aws:secretsmanager:us-east-1:000000000000:secret:telegram-bot-token" },
+        { "name": "SLACK_BOT_TOKEN", "valueFrom": "arn:aws:secretsmanager:us-east-1:000000000000:secret:slack-bot-token" },
+        { "name": "SLACK_SIGNING_SECRET", "valueFrom": "arn:aws:secretsmanager:us-east-1:000000000000:secret:slack-signing-secret" },
+        { "name": "AZURE_SPEECH_KEY", "valueFrom": "arn:aws:secretsmanager:us-east-1:000000000000:secret:azure-speech-key" },
+        { "name": "GOOGLE_CLIENT_SECRET", "valueFrom": "arn:aws:secretsmanager:us-east-1:000000000000:secret:google-client-secret" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/humanlike-ai-agent",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "api",
+          "awslogs-create-group": "true"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -fsS http://localhost:8000/healthz || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 30
+      }
+    },
+    {
+      "name": "otel-collector",
+      "image": "public.ecr.aws/aws-observability/aws-otel-collector:latest",
+      "essential": true,
+      "command": ["--config=/etc/ecs/ecs-default-config.yaml"],
+      "portMappings": [{ "containerPort": 4317, "protocol": "tcp" }],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/humanlike-ai-agent",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "otel"
+        }
+      }
+    }
+  ]
+}
