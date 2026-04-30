@@ -54,7 +54,7 @@ class HybridRetriever:
         all_docs = self.store.all()
         ids = [d["id"] for d in all_docs]
         texts = [d["text"] for d in all_docs]
-        metadatas = [d["metadata"] for d in all_docs]
+        [d["metadata"] for d in all_docs]
 
         new_texts = [d["text"] for d in documents if d.get("id") and d.get("text")]
         new_ids = [d["id"] for d in documents if d.get("id") and d.get("text")]

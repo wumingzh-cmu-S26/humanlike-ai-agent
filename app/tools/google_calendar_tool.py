@@ -1,7 +1,7 @@
 """Google Calendar tools."""
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from langchain_core.tools import StructuredTool
@@ -41,7 +41,7 @@ class CreateEventInput(BaseModel):
 
 def _list_events_sync(username: str, days_ahead: int) -> list[dict[str, Any]]:
     svc = _service(username)
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     end = now + timedelta(days=days_ahead)
     res = (
         svc.events()

@@ -1,9 +1,11 @@
 """Agent orchestrator: LangChain agent with OpenAI function calling, personality, memory, sentiment-aware perception."""
 from __future__ import annotations
 
+import contextlib
 import time
+from collections.abc import AsyncIterator
 from functools import lru_cache
-from typing import Any, AsyncIterator
+from typing import Any
 
 from langchain.agents import AgentExecutor, create_openai_functions_agent
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
@@ -11,7 +13,8 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_openai import ChatOpenAI
 
 from app.agents.personality import Personality, get_personality_registry
-from app.core.circuit_breaker import call_async as breaker_call_async, get_breaker
+from app.core.circuit_breaker import call_async as breaker_call_async
+from app.core.circuit_breaker import get_breaker
 from app.core.config import get_settings
 from app.core.logging import get_logger
 from app.memory import get_memory_manager
@@ -107,12 +110,10 @@ class AgentOrchestrator:
                 log.warning("long_term_write_failed", error=str(e))
 
         # Async summary (non-blocking)
-        try:
+        with contextlib.suppress(Exception):
             await self.memory.summary.maybe_summarize(
                 session_id, ctx["history"], self._summarize_with_fast_llm
             )
-        except Exception:
-            pass
 
         latency_ms = int((time.perf_counter() - t0) * 1000)
         return {

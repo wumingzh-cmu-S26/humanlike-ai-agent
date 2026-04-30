@@ -1,7 +1,9 @@
 """Circuit breaker registry — wraps external calls (OpenAI, Google, Telegram, Slack, Azure)."""
 from __future__ import annotations
 
-from typing import Any, Awaitable, Callable, TypeVar
+import contextlib
+from collections.abc import Awaitable, Callable
+from typing import Any, TypeVar
 
 import pybreaker
 
@@ -27,12 +29,10 @@ async def call_async(
     try:
         result = await func()
     except Exception as exc:
-        def _raise() -> None:
-            raise exc
-        try:
+        def _raise(_e: BaseException = exc) -> None:
+            raise _e
+        with contextlib.suppress(Exception):
             breaker.call(_raise)
-        except Exception:
-            pass
         raise
     breaker.call(lambda: None)
     return result

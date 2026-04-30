@@ -1,8 +1,8 @@
 """Verify breaker opens after configured failure count."""
 from __future__ import annotations
 
-import pytest
 import pybreaker
+import pytest
 
 
 def test_breaker_opens_after_failures():  # noqa: ANN201

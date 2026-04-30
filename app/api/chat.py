@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import json
-from typing import AsyncIterator
+from collections.abc import AsyncIterator
 
 from fastapi import APIRouter, Depends
 from sse_starlette.sse import EventSourceResponse

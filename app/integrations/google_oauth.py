@@ -102,8 +102,8 @@ async def callback(request: Request):  # noqa: ANN201
     creds = flow.credentials
 
     # Identify the user by email from the id_token.
-    from google.oauth2 import id_token as google_id_token
     from google.auth.transport import requests as google_requests
+    from google.oauth2 import id_token as google_id_token
 
     try:
         idinfo = google_id_token.verify_oauth2_token(

@@ -5,11 +5,8 @@ mouth shapes (visemes) and emotional pose (emotion) in sync with audio playback.
 """
 from __future__ import annotations
 
-from typing import Any
-
 from app.api.schemas import DigitalHumanEvent
 from app.voice.tts import TTSResult
-
 
 _EMOTION_TIMELINE = {
     "negative": ["sad", "concerned", "neutral"],

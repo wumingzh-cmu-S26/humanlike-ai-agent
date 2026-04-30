@@ -19,10 +19,12 @@ async def telegram_webhook(
     x_telegram_bot_api_secret_token: str | None = Header(default=None),
 ) -> dict[str, Any]:
     settings = get_settings()
-    if settings.telegram_webhook_secret:
-        if x_telegram_bot_api_secret_token != settings.telegram_webhook_secret:
-            log.warning("telegram_webhook_bad_secret")
-            raise HTTPException(401, "Bad secret")
+    if (
+        settings.telegram_webhook_secret
+        and x_telegram_bot_api_secret_token != settings.telegram_webhook_secret
+    ):
+        log.warning("telegram_webhook_bad_secret")
+        raise HTTPException(401, "Bad secret")
 
     payload = await request.json()
     msg = payload.get("message") or payload.get("edited_message")
